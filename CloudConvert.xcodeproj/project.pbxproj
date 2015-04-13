@@ -10,6 +10,7 @@
 		481102561ACEE6F20005E981 /* CloudConvert.h in Headers */ = {isa = PBXBuildFile; fileRef = 481102551ACEE6F20005E981 /* CloudConvert.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4811025C1ACEE6F20005E981 /* CloudConvert.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 481102501ACEE6F20005E981 /* CloudConvert.framework */; };
 		481102631ACEE6F20005E981 /* CloudConvertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481102621ACEE6F20005E981 /* CloudConvertTests.swift */; };
+		48DA6B4F1ACEF85100153250 /* CloudConvert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA6B4E1ACEF85100153250 /* CloudConvert.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +30,7 @@
 		4811025B1ACEE6F20005E981 /* CloudConvertTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudConvertTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		481102611ACEE6F20005E981 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		481102621ACEE6F20005E981 /* CloudConvertTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudConvertTests.swift; sourceTree = "<group>"; };
+		48DA6B4E1ACEF85100153250 /* CloudConvert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudConvert.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +55,7 @@
 		481102461ACEE6F20005E981 = {
 			isa = PBXGroup;
 			children = (
-				481102521ACEE6F20005E981 /* CloudConvert */,
+				481102521ACEE6F20005E981 /* Source */,
 				4811025F1ACEE6F20005E981 /* CloudConvertTests */,
 				481102511ACEE6F20005E981 /* Products */,
 			);
@@ -68,12 +70,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		481102521ACEE6F20005E981 /* CloudConvert */ = {
+		481102521ACEE6F20005E981 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				481102551ACEE6F20005E981 /* CloudConvert.h */,
 				481102531ACEE6F20005E981 /* Supporting Files */,
+				48DA6B4E1ACEF85100153250 /* CloudConvert.swift */,
 			);
+			name = Source;
 			path = CloudConvert;
 			sourceTree = "<group>";
 		};
@@ -209,6 +213,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				48DA6B4F1ACEF85100153250 /* CloudConvert.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,7 +274,9 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VALID_ARCHS = "i386 x86_64 arm64 armv7 armv7s";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -307,6 +314,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
+				VALID_ARCHS = "i386 x86_64 arm64 armv7 armv7s";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -315,6 +324,7 @@
 		481102671ACEE6F20005E981 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -326,12 +336,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		481102681ACEE6F20005E981 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -351,7 +363,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(SDKROOT)",
 					"$(inherited)",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -359,7 +371,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = CloudConvertTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks  @loader_path/Frameworks @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -369,11 +381,11 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(SDKROOT)",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = CloudConvertTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks  @loader_path/Frameworks @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -397,6 +409,7 @@
 				481102681ACEE6F20005E981 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		481102691ACEE6F20005E981 /* Build configuration list for PBXNativeTarget "CloudConvertTests" */ = {
 			isa = XCConfigurationList;
@@ -405,6 +418,7 @@
 				4811026B1ACEE6F20005E981 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

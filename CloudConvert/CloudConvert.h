@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Lunaweb Ltd. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for CloudConvert.
 FOUNDATION_EXPORT double CloudConvertVersionNumber;

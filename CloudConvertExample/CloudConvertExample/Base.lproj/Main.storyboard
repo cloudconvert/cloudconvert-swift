@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D131" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="CloudConvertExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="file.png" translatesAutoresizingMaskIntoConstraints="NO" id="qLp-UB-KOg">
+                                <rect key="frame" x="16" y="20" width="568" height="200"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="z4x-uG-c77"/>
+                                </constraints>
+                            </imageView>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aLb-vg-Xs2">
+                                <rect key="frame" x="0.0" y="257" width="600" height="162"/>
+                            </pickerView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Convert input.png to" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hNH-uR-or6">
+                                <rect key="frame" x="16" y="228" width="568" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="Ny8-1N-Zae"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vfu-mN-bUE">
+                                <rect key="frame" x="16" y="455" width="568" height="2"/>
+                            </progressView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Ready" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vAC-xu-PrR">
+                                <rect key="frame" x="16" y="427" width="568" height="20"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QkF-w3-wPu">
+                                <rect key="frame" x="16" y="465" width="568" height="32"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <state key="normal" title="Convert">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="convert:" destination="BYZ-38-t0r" eventType="touchUpInside" id="BPI-R5-SZl"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="hNH-uR-or6" firstAttribute="top" secondItem="qLp-UB-KOg" secondAttribute="bottom" constant="8" symbolic="YES" id="6yd-wh-km0"/>
+                            <constraint firstItem="QkF-w3-wPu" firstAttribute="leading" secondItem="Vfu-mN-bUE" secondAttribute="leading" id="DWJ-07-Ony"/>
+                            <constraint firstItem="hNH-uR-or6" firstAttribute="leading" secondItem="qLp-UB-KOg" secondAttribute="leading" id="El8-Wm-19z"/>
+                            <constraint firstItem="vAC-xu-PrR" firstAttribute="leading" secondItem="hNH-uR-or6" secondAttribute="leading" id="Esd-e0-BA0"/>
+                            <constraint firstItem="aLb-vg-Xs2" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="F3h-Gx-GFn"/>
+                            <constraint firstItem="qLp-UB-KOg" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Ftm-As-DyU"/>
+                            <constraint firstItem="QkF-w3-wPu" firstAttribute="trailing" secondItem="Vfu-mN-bUE" secondAttribute="trailing" id="J9w-9m-5ow"/>
+                            <constraint firstItem="aLb-vg-Xs2" firstAttribute="top" secondItem="hNH-uR-or6" secondAttribute="bottom" constant="8" symbolic="YES" id="JDb-g7-RjX"/>
+                            <constraint firstItem="Vfu-mN-bUE" firstAttribute="trailing" secondItem="vAC-xu-PrR" secondAttribute="trailing" id="KYS-yK-Fhs"/>
+                            <constraint firstItem="aLb-vg-Xs2" firstAttribute="centerX" secondItem="hNH-uR-or6" secondAttribute="centerX" id="Rty-8J-d8W"/>
+                            <constraint firstItem="Vfu-mN-bUE" firstAttribute="top" secondItem="vAC-xu-PrR" secondAttribute="bottom" constant="8" symbolic="YES" id="Zym-Jj-EzN"/>
+                            <constraint firstItem="vAC-xu-PrR" firstAttribute="top" secondItem="aLb-vg-Xs2" secondAttribute="bottom" constant="8" id="bkN-wM-psv"/>
+                            <constraint firstItem="qLp-UB-KOg" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="hSt-Rh-FHD"/>
+                            <constraint firstItem="hNH-uR-or6" firstAttribute="trailing" secondItem="qLp-UB-KOg" secondAttribute="trailing" id="pnD-8f-Pth"/>
+                            <constraint firstItem="Vfu-mN-bUE" firstAttribute="leading" secondItem="vAC-xu-PrR" secondAttribute="leading" id="qO0-pR-8Bi"/>
+                            <constraint firstItem="QkF-w3-wPu" firstAttribute="top" secondItem="Vfu-mN-bUE" secondAttribute="bottom" constant="8" id="tPP-PE-cFu"/>
+                            <constraint firstItem="vAC-xu-PrR" firstAttribute="trailing" secondItem="hNH-uR-or6" secondAttribute="trailing" id="wBK-Fv-oZX"/>
+                            <constraint firstItem="qLp-UB-KOg" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="ytz-f2-9Rf"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="convertButton" destination="QkF-w3-wPu" id="t6S-kL-hnq"/>
+                        <outlet property="convertToPickerView" destination="aLb-vg-Xs2" id="XKN-eL-bID"/>
+                        <outlet property="statusLabel" destination="vAC-xu-PrR" id="ERs-pA-REy"/>
+                        <outlet property="statusProgress" destination="Vfu-mN-bUE" id="d59-HV-oQ3"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="112" y="441"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="file.png" width="500" height="500"/>
+    </resources>
+</document>

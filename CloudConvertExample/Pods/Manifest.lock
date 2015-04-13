@@ -1,0 +1,17 @@
+PODS:
+  - Alamofire (1.2.0)
+  - CloudConvert (0.0.1):
+    - Alamofire (~> 1.2)
+
+DEPENDENCIES:
+  - CloudConvert (from `..`)
+
+EXTERNAL SOURCES:
+  CloudConvert:
+    :path: ..
+
+SPEC CHECKSUMS:
+  Alamofire: d765c5c1713aa64106b0228aaa600a1e6851f68d
+  CloudConvert: 797dd888d6d0b8318f0f1974984f7128df955996
+
+COCOAPODS: 0.36.3
