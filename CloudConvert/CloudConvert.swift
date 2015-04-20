@@ -454,14 +454,19 @@ public class Process: NSObject, Printable {
             
             self.currentRequest = CloudConvert.download(url, parameters: nil, { (temporaryURL, response) in
                 
-                var isDirectory: ObjCBool = ObjCBool(false)
-                if downloadPath != nil && NSFileManager.defaultManager().fileExistsAtPath(downloadPath!.absoluteString!, isDirectory: &isDirectory) {
+                var isDirectory: ObjCBool = false
+                let exists =  NSFileManager.defaultManager().fileExistsAtPath(downloadPath!.path!, isDirectory: &isDirectory)
+                if (downloadPath != nil && isDirectory) {
                     // downloadPath is a directory
                     let downloadName = response.suggestedFilename!
                     downloadPath = downloadPath!.URLByAppendingPathComponent(downloadName)
+                    NSFileManager.defaultManager().removeItemAtURL(downloadPath!, error: nil)
                     return downloadPath!
                 } else if(downloadPath != nil) {
                     // downloadPath is a file
+                    if(exists) {
+                        NSFileManager.defaultManager().removeItemAtURL(downloadPath!, error: nil)
+                    }
                     return downloadPath!
                 } else {
                     // downloadPath not set
