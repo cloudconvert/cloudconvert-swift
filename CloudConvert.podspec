@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "CloudConvert"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "Convert between 200 supported file formats"
 
   s.description  = <<-DESC
