@@ -162,6 +162,7 @@
 		481102471ACEE6F20005E981 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0620;
 				ORGANIZATIONNAME = "Lunaweb Ltd.";
 				TargetAttributes = {

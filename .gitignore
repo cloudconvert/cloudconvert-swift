@@ -1,4 +1,4 @@
-# Xcode
+
 
 build/
 *.pbxuser
@@ -16,3 +16,4 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+.DS_Store

@@ -14,7 +14,7 @@
 		48F6DBEE1ACEF54300C63959 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48F6DBED1ACEF54300C63959 /* Images.xcassets */; };
 		48F6DBF11ACEF54300C63959 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 48F6DBEF1ACEF54300C63959 /* LaunchScreen.xib */; };
 		48F6DBFD1ACEF54300C63959 /* CloudConvertExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F6DBFC1ACEF54300C63959 /* CloudConvertExampleTests.swift */; };
-		A2555DAA54AEF4F81872DFA9 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F502899C1DEBBCCEEE4D7F3 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		A2555DAA54AEF4F81872DFA9 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F502899C1DEBBCCEEE4D7F3 /* Pods.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,7 +194,9 @@
 		48F6DBD91ACEF54300C63959 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastSwiftMigration = 0710;
+				LastSwiftUpdateCheck = 0710;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Lunaweb Ltd.";
 				TargetAttributes = {
 					48F6DBE01ACEF54300C63959 = {
@@ -363,6 +365,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -431,6 +434,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = CloudConvertExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudconvert.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -445,6 +449,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = CloudConvertExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudconvert.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -464,6 +469,7 @@
 				);
 				INFOPLIST_FILE = CloudConvertExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudconvert.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudConvertExample.app/CloudConvertExample";
 			};
@@ -479,6 +485,7 @@
 				);
 				INFOPLIST_FILE = CloudConvertExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudconvert.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudConvertExample.app/CloudConvertExample";
 			};

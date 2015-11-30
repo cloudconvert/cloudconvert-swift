@@ -39,7 +39,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         convertToPickerView.dataSource = self
         convertToPickerView.delegate = self
         
-        CloudConvert.conversionTypes(["inputformat" : "png"], { (conversionTypes, error) -> Void in
+        CloudConvert.conversionTypes(["inputformat" : "png"], completionHandler: { (conversionTypes, error) -> Void in
             
             if(error != nil) {
                 let alert = UIAlertView()
@@ -81,7 +81,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
                     "download": true
                 ],
                 progressHandler: { (step, percent, message) -> Void in
-                    println(step! + " " + percent!.description + "%: " + message!)
+                    print(step! + " " + percent!.description + "%: " + message!)
                     dispatch_async(dispatch_get_main_queue(),{
                         self.statusLabel.text = message
                         self.statusProgress.setProgress(percent! / 100, animated: false)
@@ -92,15 +92,15 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
                     self.convertButton.setTitle("Convert", forState: .Normal)
                     
                     if(error != nil) {
-                        println("failed: " + error!.description)
+                        print("failed: " + error!.description)
                         let alert = UIAlertView()
                         alert.title = "Failed to convert file"
-                        println(error)
+                        print(error)
                         alert.message = error!.localizedDescription
                         alert.addButtonWithTitle("OK")
                         alert.show()
                     } else {
-                        println("done! output file saved to: " + path!.description)
+                        print("done! output file saved to: " + path!.description)
                         // preview output file
                         self.outputFile = path!
                         let preview =  QLPreviewController()
@@ -126,7 +126,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     
     //MARK: UIPickerViewDelegate
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
+    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return conversionTypes[row]["outputformat"] as? String
     }
     
@@ -136,11 +136,11 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     
     //MARK: QLPreviewControllerDataSource
-    func numberOfPreviewItemsInPreviewController(controller: QLPreviewController!) -> Int {
+    func numberOfPreviewItemsInPreviewController(controller: QLPreviewController) -> Int {
         return 1
     }
     
-    func previewController(controller: QLPreviewController!, previewItemAtIndex index: Int) -> QLPreviewItem! {
+    func previewController(controller: QLPreviewController, previewItemAtIndex index: Int) -> QLPreviewItem {
         return self.outputFile!
     }
 

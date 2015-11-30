@@ -1,5 +1,5 @@
 framework module CloudConvert {
-  umbrella header "Pods-CloudConvert-umbrella.h"
+  umbrella header "CloudConvert-umbrella.h"
 
   export *
   module * { export * }

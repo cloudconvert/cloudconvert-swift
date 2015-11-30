@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "CloudConvert"
-  s.version      = "1.0.1"
+  s.version      = "1.0.2"
   s.summary      = "Convert between 200 supported file formats"
 
   s.description  = <<-DESC
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   s.source_files = 'CloudConvert/*.swift'
 
-  s.dependency "Alamofire", "~> 1.2"
+  s.dependency "Alamofire", "~> 3.0"
   
 
 end
