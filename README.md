@@ -71,7 +71,7 @@ pod install
 
 ### Manually
 If you prefer not to use CocoaPods, you can integrate CloudConvert into your project manually.
-As CloudConvert depends on [Alamofire](https://github.com/Alamofire/Alamofire), you need to add [Alamofire.swift](https://github.com/Alamofire/Alamofire/blob/master/Source/Alamofire.swift) to your XCode Project first. Afterwards you can add the [CloudConvert.swift](https://github.com/cloudconvert/cloudconvert-swift/blob/master/Source/CloudConvert.swift) Source file.
+As CloudConvert depends on [Alamofire](https://github.com/Alamofire/Alamofire), you need to add [Alamofire.swift](https://github.com/Alamofire/Alamofire/blob/master/Source/Alamofire.swift) to your Xcode Project first. Afterwards you can add the [CloudConvert.swift](https://github.com/cloudconvert/cloudconvert-swift/blob/master/Source/CloudConvert.swift) Source file.
 
 Note that any calling conventions described in this README with the CloudConvert prefix would instead omit it (for example, ``CloudConvert.convert`` becomes ``convert``), since this functionality is incorporated into the top-level namespace.
 
@@ -83,7 +83,7 @@ It is a good starting point to have a look at the CloudConvert Example project i
 To open the project:
 
 * Checkout (or download) this repository
-* Open CloudConvertExample***.xcworkspace*** in the CloudConvertExample folder with XCode
+* Open CloudConvertExample***.xcworkspace*** in the CloudConvertExample folder with Xcode
 
 ## Resources
 
