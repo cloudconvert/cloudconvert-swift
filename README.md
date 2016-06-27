@@ -26,11 +26,11 @@ CloudConvert.convert([
                     "download": outputURL
                 ],
                 progressHandler: { (step, percent, message) -> Void in
-                    println(step! + " " + percent!.description + "%: " + message!)
+                    print(step! + " " + percent!.description + "%: " + message!)
                 },
                 completionHandler: { (path, error) -> Void in
                     if(error != nil) {
-                        println("failed: " + error!.description)
+                        print("failed: " + error!.description)
                     } else {
                         println("done! output file saved to: " + path!.description)
                     }   
