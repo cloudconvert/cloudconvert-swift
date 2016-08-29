@@ -123,28 +123,9 @@ public func upload(URLString: Alamofire.URLStringConvertible, parameters: [Strin
     
     let encoding: Alamofire.ParameterEncoding = .URL
     
-    let request: NSMutableURLRequest = (encoding.encode(URLRequest(Alamofire.Method.GET, URLString: URLString), parameters: parameters).0).mutableCopy() as! NSMutableURLRequest
-    // set method to GET first to let Alamofire encode it as query parameters
-    request.HTTPMethod = "POST"
+    let request: NSURLRequest = (encoding.encode(URLRequest(Alamofire.Method.PUT, URLString: URLString), parameters: parameters).0).mutableCopy() as! NSMutableURLRequest
 
-    
-    let boundary = "NET-POST-boundary-\(arc4random())-\(arc4random())"
-  
-    request.setValue("multipart/form-data;boundary=" + boundary, forHTTPHeaderField: "Content-Type")
-    
-    let postdata = NSMutableData()
-    for s in ["\r\n--\(boundary)\r\n",
-        "Content-Disposition: form-data; name=\"file\"; filename=\"\(file.lastPathComponent!)\"\r\n",
-        "Content-Type: application/octet-stream\r\n\r\n"] {
-            postdata.appendData(s.dataUsingEncoding(NSUTF8StringEncoding)!)
-    }
-    postdata.appendData(NSData(contentsOfURL: file)!)
-    postdata.appendData("\r\n--\(boundary)--\r\n".dataUsingEncoding(NSUTF8StringEncoding)!)
-
-    
-    return manager.upload(request, data: postdata)
-    
-
+    return manager.upload(request, file: file)
     
 }
 
@@ -427,6 +408,8 @@ public class Process: NSObject {
             return self
         }
         
+        let file: NSURL? = parameters["file"] as? NSURL
+        
         
         let startRequestComplete : (NSURLRequest, NSHTTPURLResponse?, AnyObject?, NSError?) -> Void = { (_, _, data, error) -> Void in
             self.currentRequest = nil;
@@ -434,38 +417,77 @@ public class Process: NSObject {
                 completionHandler?(error)
             } else {
                 self.data = data
-                completionHandler?(nil)
+                
+                if (file != nil && (parameters["input"] as? String) == "upload") {
+                    self.upload(file!,completionHandler: completionHandler)
+                }
+                else {
+                    completionHandler?(nil)
+                }
             }
         }
-        
 
         parameters.removeValueForKey("download")
         
-        let file: NSURL? = parameters["file"] as? NSURL
-        
-        if (file != nil && (parameters["input"] as? String) == "upload") {
-            parameters.removeValueForKey("file")
-            
-            let formatter = NSByteCountFormatter()
-            formatter.allowsNonnumericFormatting = false
-            
-            self.currentRequest = CloudConvert.upload(self.url!, parameters: parameters, file: file!).progress { (bytesWritten, totalBytesWritten, totalBytesExpectedToWrite) in
-                let percent: Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite) * 100
-                let message = "Uploading (" + formatter.stringFromByteCount(totalBytesWritten) + " / " + formatter.stringFromByteCount(totalBytesExpectedToWrite) + ") ..."
-                self.delegate?.conversionProgress(self, step: "upload", percent: percent, message: message)
-                self.progressHandler?(step: "upload", percent: percent, message: message)
-            }.responseCloudConvertApi(startRequestComplete)
-        } else {
-            if(file != nil) {
-                parameters["file"] = file!.absoluteString
-            }
-            self.currentRequest = CloudConvert.req(.POST, URLString: self.url!, parameters: parameters).responseCloudConvertApi(startRequestComplete)
+        if(file != nil) {
+            parameters["file"] = file!.absoluteString
         }
+        self.currentRequest = CloudConvert.req(.POST, URLString: self.url!, parameters: parameters).responseCloudConvertApi(startRequestComplete)
+        
     
         return self
     }
     
+    
+    /**
+     
+     Uploads an input file to the CloudConvert API
+     
+     :param: uploadPath        Local path of the input file.
+     :param: completionHandler   The code to be executed once the upload has finished.
+     
+     :returns: CloudConvert.Process
+     
+     */
+    
+    public func upload(var uploadPath: NSURL, completionHandler: ((NSError?) -> Void)?) -> Self {
+    
+        
+        if let upload = self.data?["upload"] as? NSDictionary, var url = upload["url"] as? String  {
+            
+            url += "/" + uploadPath.lastPathComponent!
+            
+            let formatter = NSByteCountFormatter()
+            formatter.allowsNonnumericFormatting = false
 
+            self.currentRequest = CloudConvert.upload(url, file: uploadPath)
+                .progress { (bytesWritten, totalBytesWritten, totalBytesExpectedToWrite) in
+                
+                    let percent: Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite) * 100
+                    let message = "Uploading (" + formatter.stringFromByteCount(totalBytesWritten) + " / " + formatter.stringFromByteCount(totalBytesExpectedToWrite) + ") ..."
+                    self.delegate?.conversionProgress(self, step: "upload", percent: percent, message: message)
+                    self.progressHandler?(step: "upload", percent: percent, message: message)
+                
+                }
+                .responseCloudConvertApi { (_, _, data, error) -> Void in
+                    self.currentRequest = nil;
+                    if(error != nil) {
+                        completionHandler?(error)
+                    } else {
+                        completionHandler?(nil)
+                    }
+                }
+
+            
+        } else {
+            completionHandler?(NSError(domain: errorDomain, code: -1, userInfo: ["localizedDescription" : "File cannot be uploaded in this process state!"] ))
+        }
+        
+        
+
+    
+        return self
+    }
     
     /**
     
