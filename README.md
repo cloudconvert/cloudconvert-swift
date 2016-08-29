@@ -83,6 +83,7 @@ It is a good starting point to have a look at the CloudConvert Example project i
 To open the project:
 
 * Checkout (or download) this repository
+* Execute ``pod install`` in the CloudConvertExample folder
 * Open CloudConvertExample***.xcworkspace*** in the CloudConvertExample folder with XCode
 
 ## Resources

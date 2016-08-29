@@ -1,6 +1,0 @@
-framework module CloudConvert {
-  umbrella header "CloudConvert-umbrella.h"
-
-  export *
-  module * { export * }
-}
