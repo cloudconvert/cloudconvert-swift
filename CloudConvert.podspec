@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   s.source_files = 'CloudConvert/*.swift'
 
-  s.dependency "Alamofire", "~> 3.0"
+  s.dependency "Alamofire", "~> 3.4"
   
 
 end
