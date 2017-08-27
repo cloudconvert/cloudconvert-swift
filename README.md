@@ -1,7 +1,7 @@
 cloudconvert-swift
 =======================
 
-This is a lightweight wrapper for the [CloudConvert](https://cloudconvert.com) API, written in Swift. It is compatible with iOS 7.0+ / Mac OS X 10.9+ and requires Xcode 6.3.
+This is a lightweight wrapper for the [CloudConvert](https://cloudconvert.com) API, written in Swift. It is compatible with iOS 9.0+ / Mac OS X 10.12+ and requires Xcode 8.
 
 Feel free to use, improve or modify this wrapper! If you have questions contact us or open an issue on GitHub.
 
@@ -15,26 +15,24 @@ import CloudConvert
 
 CloudConvert.apiKey = "your_api_key"
 
-let inputURL = NSBundle.mainBundle().URLForResource("file",withExtension: "png")!
-let outputURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0] as? NSURL
+let inputURL = Bundle.main.url(forResource: "file", withExtension: "png")!
+let outputURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
 
-CloudConvert.convert([
-                    "inputformat": "png",
-                    "outputformat" : "pdf",
-                    "input" : "upload",
-                    "file": inputURL,
-                    "download": outputURL
-                ],
-                progressHandler: { (step, percent, message) -> Void in
-                    print(step! + " " + percent!.description + "%: " + message!)
-                },
-                completionHandler: { (path, error) -> Void in
-                    if(error != nil) {
-                        print("failed: " + error!.description)
-                    } else {
-                        println("done! output file saved to: " + path!.description)
-                    }   
-            })
+let process = CloudConvert.convert(parameters: [
+    "inputformat"  : "png",
+    "outputformat" : "pdf",
+    "input"        : "upload",
+    "file"         : inputURL,
+    "download"     : outputURL
+    ], progressHandler: { (step, percent, message) -> Void in
+        print(step! + " " + percent!.description + "%: " + message!)
+}, completionHandler: { (path, error) -> Void in
+    if let error = error {
+        print("failed: " + error.localizedDescription)
+    } else {
+        print("done! output file saved to: " + path!.description)
+    }
+})
 ```
 
 You can use the [CloudConvert API Console](https://cloudconvert.com/apiconsole) to generate ready-to-use Swift code snippets using this wrapper.
@@ -57,7 +55,7 @@ To integrate CloudConvert into your Xcode project using CocoaPods, specify it in
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '8.0'
+platform :ios, '9.0'
 use_frameworks!
 
 pod 'CloudConvert', '~> 1.0'
