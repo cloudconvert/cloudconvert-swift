@@ -1,7 +1,7 @@
 PODS:
-  - Alamofire (3.4.2)
-  - CloudConvert (1.0.2):
-    - Alamofire (~> 3.4)
+  - Alamofire (4.5.1)
+  - CloudConvert (1.0.3):
+    - Alamofire (~> 4.5)
 
 DEPENDENCIES:
   - CloudConvert (from `..`)
@@ -11,9 +11,9 @@ EXTERNAL SOURCES:
     :path: ..
 
 SPEC CHECKSUMS:
-  Alamofire: 6aa33201d20d069e1598891cf928883ff1888c7a
-  CloudConvert: 99da39d0645dcc338478c04ba247c6fb66221d22
+  Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
+  CloudConvert: 93e787af4e7739966d0bcea5d38e09fc2676f3b4
 
 PODFILE CHECKSUM: a1adb91ccaec47ebb5b3828561c29669d891d75e
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.3.1
