@@ -1,7 +1,7 @@
 cloudconvert-swift
 =======================
 
-This is a lightweight wrapper for the [CloudConvert](https://cloudconvert.com) API, written in Swift. It is compatible with iOS 7.0+ / Mac OS X 10.9+ and requires Xcode 6.3.
+This is a lightweight wrapper for the [CloudConvert](https://cloudconvert.com) API, written in Swift. It is compatible with iOS 9.0+ / Mac OS X 10.9+ and requires Xcode 9.0.
 
 Feel free to use, improve or modify this wrapper! If you have questions contact us or open an issue on GitHub.
 
@@ -57,7 +57,7 @@ To integrate CloudConvert into your Xcode project using CocoaPods, specify it in
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '8.0'
+platform :ios, '9.0'
 use_frameworks!
 
 pod 'CloudConvert', '~> 1.0'
