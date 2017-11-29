@@ -43,588 +43,468 @@ public let errorDomain = "com.cloudconvert.error"
 
 // MARK: - Request
 
-private var managerInstance: Alamofire.Manager?
-private var manager: Alamofire.Manager {
-    if((managerInstance) != nil) {
-        return managerInstance!;
+private var managerInstance: Alamofire.SessionManager?
+
+private var manager: Alamofire.SessionManager {
+
+    if (managerInstance != nil) {
+        return managerInstance!
     }
-    //let configuration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("com.cloudconvert.background")
-    let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-    configuration.HTTPAdditionalHeaders = [
+
+    let configuration = URLSessionConfiguration.default
+    configuration.httpAdditionalHeaders = [
         "Authorization": "Bearer " + apiKey
     ]
-    managerInstance = Alamofire.Manager(configuration: configuration)
-    return managerInstance!;
+
+    managerInstance = SessionManager(configuration: configuration)
+    return managerInstance!
 }
 
 
 /**
 
-Creates a NSURLRequest for API Requests
+ */
+private func stringURL(for endpoint: String) -> String {
 
-:param: URLString   The URL String, can be relative to api Host
-:param: parameters  Dictionary of Query String (GET) or JSON Body (POST) parameters
-
-:returns: NSURLRequest
-
-*/
-private func URLRequest(method: Alamofire.Method, var URLString: Alamofire.URLStringConvertible) -> NSURLRequest {
-    
-    if let url = URLString as? String {
-        if url.hasPrefix("//") {
-            URLString =  apiProtocol + ":" + url;
-        } else if !url.hasPrefix("http") {
-            URLString =  apiProtocol + "://" + apiHost + url;
-        }
+    var url = endpoint
+    if url.hasPrefix("//") {
+        url =  apiProtocol + ":" + url;
+    } else if !url.hasPrefix("http") {
+        url =  apiProtocol + "://" + apiHost + url;
     }
-    
-    let mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: URLString.URLString)!)
-    mutableURLRequest.HTTPMethod = method.rawValue
-    
-    return mutableURLRequest
-}
 
+    return url
+}
 
 /**
 
-Wrapper for Alamofire.request()
+ Wrapper for Alamofire.request()
 
-:param: method      HTTP Method (.GET, .POST...)
-:param: URLString   The URL String, can be relative to api Host
-:param: parameters  Dictionary of Query String (GET) or JSON Body (POST) parameters
+ :param: url         The URL String, can be relative to api Host
+ :param: method      HTTP Method (.GET, .POST...)
+ :param: parameters  Dictionary of Query String (GET) or JSON Body (POST) parameters
 
-:returns: Alamofire.Request
+ :returns: Alamofire.Request
 
-*/
-public func req(method: Alamofire.Method, URLString: Alamofire.URLStringConvertible, parameters: [String: AnyObject]? = nil) -> Alamofire.Request {
-    
-    var encoding: Alamofire.ParameterEncoding = .URL
-    if(method == .POST) {
-        encoding = .JSON
+ */
+public func req(url: String, method: Alamofire.HTTPMethod, parameters: Parameters? = nil) -> Alamofire.DataRequest {
+
+    var encoding: Alamofire.ParameterEncoding = URLEncoding()
+    if method == .post {
+        encoding = JSONEncoding()
     }
-    
-    return manager.request(encoding.encode(URLRequest(method, URLString: URLString), parameters: parameters).0)
 
+    let strURL = stringURL(for: url)
+    let request = manager.request(strURL, method: method, parameters: parameters, encoding: encoding)
+
+    return request
 }
-
-/**
-
-Wrapper for Alamofire.upload()
-
-:param: URLString   The URL String, can be relative to api Host
-:param: parameters  Dictionary of Query String parameters
-:param: file        The NSURL to the local file to upload
-
-:returns: Alamofire.Request
-
-*/
-
-public func upload(URLString: Alamofire.URLStringConvertible, parameters: [String: AnyObject]? = nil, file: NSURL) -> Alamofire.Request {
-    
-    let encoding: Alamofire.ParameterEncoding = .URL
-    
-    let request: NSURLRequest = (encoding.encode(URLRequest(Alamofire.Method.PUT, URLString: URLString), parameters: parameters).0).mutableCopy() as! NSMutableURLRequest
-
-    return manager.upload(request, file: file)
-    
-}
-
-/**
-
-Wrapper for Alamofire.download()
-
-:param: URLString   The URL String, can be relative to api Host
-:param: parameters  Dictionary of Query String parameters
-:param: destination Closure to generate the destination NSURL
-
-:returns: Alamofire.Request
-
-*/
-public func download(URLString: Alamofire.URLStringConvertible, parameters: [String: AnyObject]? = nil, destination: Alamofire.Request.DownloadFileDestination) -> Alamofire.Request {
-
-    let encoding: Alamofire.ParameterEncoding = .URL
-    let request = encoding.encode(URLRequest(Alamofire.Method.GET, URLString: URLString), parameters: parameters).0
-
-    return manager.download(request, destination: destination)
-}
-
-
 
 
 /**
 
-Response Serializer for the CloudConvert API
+ Wrapper for Alamofire.upload()
 
-*/
+ :param: url   The URL String, can be relative to api Host
+ :param: file  The URL to the local file to upload
 
-extension Request {
-    
-    /**
-    
-    Parse Response from the CloudConvert API
-    
-    :param: completionHandler   The code to be executed once the request has finished.
-    
-    :returns: Alamofire.Request
-    
-    */
-    
-    
+ :returns: Alamofire.Request
 
-    public static func CloudConvertSerializer() -> ResponseSerializer<AnyObject, NSError> {
-        return  ResponseSerializer  { request, response, data, error in
-            guard error == nil else { return .Failure(error!) }
-            
-            
-            let JSONSerializer = Request.JSONResponseSerializer(options: .AllowFragments)
-            let result = JSONSerializer.serializeResponse(request, response, data, error)
-            
-            
-            switch result {
-            case .Success(let value):
-                if let response = response {
-                    if(!(200..<300).contains(response.statusCode) ) {
-                        let message: String? = (value["error"] as? String != nil ? value["error"] as? String : value["message"] as? String)
-                        let error = Error.errorWithCode(response.statusCode, failureReason: message != nil ? message! : "Unknown error")
-                        return .Failure(error)
-                    } else {
-                        return .Success(value)
-                    }
-                } else {
-                    let failureReason = "Response collection could not be serialized due to nil response"
-                    let error = Error.errorWithCode(.JSONSerializationFailed, failureReason: failureReason)
-                    return .Failure(error)
-                }
-            case .Failure(let error):
-                return .Failure(error)
-            }
-            
-            
-            
-        }
-    }
-        
-    
-    public func responseCloudConvertApi(completionHandler: (NSURLRequest, NSHTTPURLResponse?, AnyObject?, NSError?) -> Void) -> Self {
-        
-        return response(responseSerializer: Request.CloudConvertSerializer(), completionHandler: { res in
-            
-            switch res.result {
-            case .Success(let value):
-                completionHandler(self.request!, self.response, value, nil)
-            case .Failure(let error):
-                completionHandler(self.request!, self.response, nil, error)
-                
-            }
-            
-            
-        })
+ */
+public func ccUpload(url: String, file: URL) -> Alamofire.UploadRequest {
 
-        
-        
- 
-    }
+    let strURL = stringURL(for: url)
+    let request = manager.upload(file, to: strURL, method: .put)
+
+    return request
 }
 
 
+/**
+
+ Wrapper for Alamofire.download()
+
+ :param: url         The URL String, can be relative to api Host
+ :param: parameters  Dictionary of Query String parameters
+ :param: destination Closure to generate the destination NSURL
+
+ :returns: Alamofire.Request
+
+ */
+public func ccDownload(url: String, parameters: Parameters? = nil, destination: @escaping Alamofire.DownloadRequest.DownloadFileDestination) -> Alamofire.DownloadRequest {
+
+    let strURL = stringURL(for: url)
+    let request = manager.download(strURL, method: .get, parameters: parameters, to: destination)
+
+    return request
+}
 
 
 // MARK: - Process
 
 public protocol ProcessDelegate {
     /**
-    
-    Monitor conversion progress
-    
-    :param: process     The CloudConvert.Process
-    :param: step        Current step of the process; see https://cloudconvert.com/apidoc#status
-    :param: percent     Percentage (0-100) of the current step as Float value
-    :param: message     Description of the current progress
-    
-    */
-    func conversionProgress(process: Process, step: String?, percent: Float?, message: String?)
-    
+
+     Monitor conversion progress
+
+     :param: process     The CloudConvert.Process
+     :param: step        Current step of the process; see https://cloudconvert.com/apidoc#status
+     :param: percent     Percentage (0-100) of the current step as Float value
+     :param: message     Description of the current progress
+
+     */
+    func conversionProgress(process: Process, step: String?, percent: CGFloat?, message: String?)
+
     /**
-    
-    Conversion completed on server side. This happens before the output file was downloaded!
-    
-    :param: process     The CloudConvert.Process
-    :param: error       NSError object if the conversion failed
-    
-    */
-    func conversionCompleted(process: Process?, error: NSError?)
-    
-    
+
+     Conversion completed on server side. This happens before the output file was downloaded!
+
+     :param: process     The CloudConvert.Process
+     :param: error       Error object if the conversion failed
+
+     */
+    func conversionCompleted(process: Process?, error: Error?)
+
+
     /**
-    
-    Conversion output file was downloaded to local path
-    
-    :param: process     The CloudConvert.Process
-    :param: path        NSURL of the downloaded output file
-    
-    */
-    func conversionFileDownloaded(process: Process?, path: NSURL)
+
+     Conversion output file was downloaded to local path
+
+     :param: process     The CloudConvert.Process
+     :param: path        URL of the downloaded output file
+
+     */
+    func conversionFileDownloaded(process: Process?, path: URL)
 }
 
 
 public class Process: NSObject {
-    
+
     public var delegate: ProcessDelegate? = nil
     public var url: String?
 
-    private var data: AnyObject? = [:] {
+    private var data: [String: Any]? = [:] {
         didSet {
             if let url = data?["url"] as? String {
                 self.url = url
             }
         }
     }
-    
+
     private var currentRequest: Alamofire.Request? = nil
-    private var waitCompletionHandler: ((NSError?) -> Void)? = nil
-    private var progressHandler: ((step: String?, percent: Float?, message: String?) -> Void)? = nil
-    private var refreshTimer: NSTimer? = nil
+    private var waitCompletionHandler: ((Error?) -> Void)? = nil
+    fileprivate var progressHandler: ((_ step: String?, _ percent: CGFloat?, _ message: String?) -> Void)? = nil
+    private var refreshTimer: Timer? = nil
 
-    
-    subscript(name: String) -> AnyObject?
-        {
-            return data?[name]
-        }
-
-    override init() {
-        
+    subscript(name: String) -> Any? {
+        return data?[name]
     }
-    
+
+    override init() { }
+
     init(url: String) {
         self.url = url
     }
-    
-    
+
+
     /**
-    
-    Create Process on the CloudConvert API
-    
-    :param: parameters          Dictionary of parameters. See: https://cloudconvert.com/apidoc#create
-    :param: completionHandler   The code to be executed once the request has finished.
-    
-    :returns: CloudConvert.Process
-    
-    */
-    public func create(var parameters: [String: AnyObject], completionHandler: (NSError?) -> Void) -> Self {
-        
-        parameters.removeValueForKey("file")
-        parameters.removeValueForKey("download")
-        
-        req(.POST, URLString: "/process", parameters: parameters).responseCloudConvertApi { (_, _, data, error) -> Void in
-            if(error != nil) {
+
+     Create Process on the CloudConvert API
+
+     :param: parameters          Dictionary of parameters. See: https://cloudconvert.com/apidoc#create
+     :param: completionHandler   The code to be executed once the request has finished.
+
+     :returns: CloudConvert.Process
+
+     */
+    public func create(parameters: [String: Any], completionHandler: @escaping (Error?) -> Void) -> Self {
+
+        var parameters = parameters
+        parameters.removeValue(forKey: "file")
+        parameters.removeValue(forKey: "download")
+
+        req(url: "/process", method: .post, parameters: parameters).responseJSON { (response: DataResponse<Any>) in
+            if let error = response.error {
+
                 completionHandler(error)
-            } else if let url = data?["url"] as? String  {
+            } else if let dict = response.value as? [String : Any],
+                let url = dict["url"] as? String {
+
                 self.url = url
                 completionHandler(nil)
             } else {
+
                 completionHandler(NSError(domain: errorDomain, code: -1, userInfo: nil))
             }
         }
         return self
     }
-    
-    
+
+
     /**
-    
-    Refresh process data from API
-    
-    :param: parameters          Dictionary of Query String parameters
-    :param: completionHandler   The code to be executed once the request has finished.
-    
-    :returns: CloudConvert.Process
-    
-    */
-    public func refresh(parameters: [String: AnyObject]? = nil, completionHandler: ((NSError?) -> Void)? = nil ) -> Self {
-        
-        if(self.currentRequest != nil) {
+
+     Refresh process data from API
+
+     :param: parameters          Dictionary of Query String parameters
+     :param: completionHandler   The code to be executed once the request has finished.
+
+     :returns: CloudConvert.Process
+
+     */
+    public func refresh(parameters: Parameters? = nil, completionHandler: ((Error?) -> Void)? = nil) -> Self {
+
+        if currentRequest != nil {
             // if there is a active refresh request, cancel it
-            self.currentRequest!.cancel()
+            self.currentRequest?.cancel()
         }
-        
-        if(self.url == nil) {
+
+        guard let url = url else {
             completionHandler?(NSError(domain: errorDomain, code: -1, userInfo: ["localizedDescription" : "No Process URL!"] ))
             return self
         }
-        
-        self.currentRequest = CloudConvert.req(.GET, URLString: self.url!, parameters: parameters).responseCloudConvertApi { (_, _, data, error) -> Void in
-            
-       
-            self.currentRequest = nil;
-            if(error != nil) {
+
+        currentRequest = req(url: url, method: .get, parameters: parameters).responseJSON { [weak self] response in
+
+            self?.currentRequest = nil
+            let currentValue = response.value as? [String : Any]
+            if let error = response.error {
                 completionHandler?(error)
-            } else {
-                self.data = data
+            } else if let value = currentValue {
+                self?.data = value
                 completionHandler?(nil)
             }
-            
-            self.progressHandler?(step: self.data?["step"] as? String, percent: self.data?["percent"] as? Float, message: self.data?["message"] as? String)
-            self.delegate?.conversionProgress(self, step: self.data?["step"] as? String, percent: self.data?["percent"] as? Float, message: self.data?["message"] as? String)
-            
-            if(error != nil || self.data?["step"] as? String == "finished") {
-                
-                // conversion finished
-                
-                dispatch_async(dispatch_get_main_queue(),{
-                self.refreshTimer?.invalidate()
-                self.refreshTimer = nil
-                })
-                
-                self.waitCompletionHandler?(error)
-                self.waitCompletionHandler = nil
-                
-                self.delegate?.conversionCompleted(self, error: error)
-                
-                
-    
+
+            self?.progressHandler?(currentValue?["step"] as? String, currentValue?["percent"] as? CGFloat, currentValue?["message"] as? String)
+            if let strongSelf = self {
+                strongSelf.delegate?.conversionProgress(process: strongSelf, step: currentValue?["step"] as? String, percent: currentValue?["percent"] as? CGFloat, message: currentValue?["message"] as? String)
             }
-            
-            
+
+            if response.error != nil || (currentValue?["step"] as? String) == "finished" {
+
+                // Conversion finished
+                DispatchQueue.main.async {
+                    self?.refreshTimer?.invalidate()
+                    self?.refreshTimer = nil
+                }
+
+                self?.waitCompletionHandler?(response.error)
+                self?.waitCompletionHandler = nil
+
+                self?.delegate?.conversionCompleted(process: self, error: response.error)
+            }
+
         }
         return self
     }
-    
-    
 
     /**
-    
-    Starts the conversion on the CloudConvert API
-    
-    :param: parameters          Dictionary of parameters. See: https://cloudconvert.com/apidoc#start
-    :param: completionHandler   The code to be executed once the request has finished.
-    
-    :returns: CloudConvert.Process
-    
-    */
-    public func start(var parameters: [String: AnyObject], completionHandler: ((NSError?) -> Void)?) -> Self {
-        
-        
-        if(self.url == nil) {
+
+     Starts the conversion on the CloudConvert API
+
+     :param: parameters          Dictionary of parameters. See: https://cloudconvert.com/apidoc#start
+     :param: completionHandler   The code to be executed once the request has finished.
+
+     :returns: CloudConvert.Process
+
+     */
+    public func start(parameters: Parameters? = nil, completionHandler: ((Error?) -> Void)? = nil) -> Self {
+
+        guard let url = url else {
             completionHandler?(NSError(domain: errorDomain, code: -1, userInfo: ["localizedDescription" : "No Process URL!"] ))
             return self
         }
-        
-        let file: NSURL? = parameters["file"] as? NSURL
-        
-        
-        let startRequestComplete : (NSURLRequest, NSHTTPURLResponse?, AnyObject?, NSError?) -> Void = { (_, _, data, error) -> Void in
-            self.currentRequest = nil;
-            if(error != nil) {
+
+        var parameters = parameters
+        let file: URL? = parameters?["file"] as? URL
+        parameters?.removeValue(forKey: "download")
+
+        if let file = file {
+            parameters?["file"] = file.absoluteString
+        }
+
+        currentRequest = req(url: url, method: .post, parameters: parameters).responseJSON { [weak self] response in
+
+            self?.currentRequest = nil
+            let currentValue = response.value as? [String : Any]
+            if let error = response.error {
                 completionHandler?(error)
             } else {
-                self.data = data
-                
-                if (file != nil && (parameters["input"] as? String) == "upload") {
-                    self.upload(file!,completionHandler: completionHandler)
-                }
-                else {
+
+                self?.data = currentValue
+                if let file = file, (parameters?["input"] as? String) == "upload" {
+                    // Upload
+                    _ = self?.upload(uploadPath: file, completionHandler: completionHandler)
+                } else {
                     completionHandler?(nil)
                 }
             }
         }
 
-        parameters.removeValueForKey("download")
-        
-        if(file != nil) {
-            parameters["file"] = file!.absoluteString
-        }
-        self.currentRequest = CloudConvert.req(.POST, URLString: self.url!, parameters: parameters).responseCloudConvertApi(startRequestComplete)
-        
-    
         return self
     }
-    
-    
+
+
     /**
-     
+
      Uploads an input file to the CloudConvert API
-     
+
      :param: uploadPath        Local path of the input file.
      :param: completionHandler   The code to be executed once the upload has finished.
-     
+
      :returns: CloudConvert.Process
-     
+
      */
-    
-    public func upload(var uploadPath: NSURL, completionHandler: ((NSError?) -> Void)?) -> Self {
-    
-        
-        if let upload = self.data?["upload"] as? NSDictionary, var url = upload["url"] as? String  {
-            
-            url += "/" + uploadPath.lastPathComponent!
-            
-            let formatter = NSByteCountFormatter()
+    public func upload(uploadPath: URL, completionHandler: ((Error?) -> Void)?) -> Self {
+
+        if let upload = self.data?["upload"] as? [String: String], var url = upload["url"] {
+
+            url += "/" + uploadPath.lastPathComponent
+
+            let formatter = ByteCountFormatter()
             formatter.allowsNonnumericFormatting = false
 
-            self.currentRequest = CloudConvert.upload(url, file: uploadPath)
-                .progress { (bytesWritten, totalBytesWritten, totalBytesExpectedToWrite) in
-                
-                    let percent: Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite) * 100
-                    let message = "Uploading (" + formatter.stringFromByteCount(totalBytesWritten) + " / " + formatter.stringFromByteCount(totalBytesExpectedToWrite) + ") ..."
-                    self.delegate?.conversionProgress(self, step: "upload", percent: percent, message: message)
-                    self.progressHandler?(step: "upload", percent: percent, message: message)
-                
-                }
-                .responseCloudConvertApi { (_, _, data, error) -> Void in
-                    self.currentRequest = nil;
-                    if(error != nil) {
-                        completionHandler?(error)
-                    } else {
-                        completionHandler?(nil)
-                    }
-                }
+            currentRequest = ccUpload(url: url, file: uploadPath).uploadProgress(closure: { [weak self] progress in
 
-            
+                let totalBytesExpectedToSend = progress.totalUnitCount
+                let totalBytesSent = progress.completedUnitCount
+
+                let percent = CGFloat(totalBytesSent) / CGFloat(totalBytesExpectedToSend)
+                let message = "Uploading (" + formatter.string(fromByteCount: totalBytesSent) + " / " + formatter.string(fromByteCount: totalBytesExpectedToSend) + ") ..."
+
+                if let strongSelf = self {
+                    strongSelf.delegate?.conversionProgress(process: strongSelf, step: "upload", percent: percent, message: message)
+                    strongSelf.progressHandler?("upload", percent, message)
+                }
+            }).responseJSON(completionHandler: { (response) in
+
+                if let error = response.error {
+                    completionHandler?(error)
+                } else {
+                    completionHandler?(nil)
+                }
+            })
         } else {
             completionHandler?(NSError(domain: errorDomain, code: -1, userInfo: ["localizedDescription" : "File cannot be uploaded in this process state!"] ))
         }
-        
-        
 
-    
         return self
     }
-    
+
     /**
-    
-    Downloads the output file from the CloudConvert API
-    
-    :param: downloadPath        Local path for downloading the output file.
-                                If set to nil a temporary location will be choosen.
-                                Can be set to a directory or a file. Any existing file will be overwritten.
-    :param: completionHandler   The code to be executed once the download has finished.
-    
-    :returns: CloudConvert.Process
-    
-    */
-    public func download(var downloadPath: NSURL? = nil, completionHandler: ((NSURL?, NSError?) -> Void)?) -> Self {
-        
-        
-        if let output = self.data?["output"] as? NSDictionary, let url = output["url"] as? String  {
-            
-            let formatter = NSByteCountFormatter()
+
+     Downloads the output file from the CloudConvert API
+
+     :param: downloadPath        Local path for downloading the output file.
+     If set to nil a temporary location will be choosen.
+     Can be set to a directory or a file. Any existing file will be overwritten.
+     :param: completionHandler   The code to be executed once the download has finished.
+
+     :returns: CloudConvert.Process
+
+     */
+    public func download(downloadPath: URL? = nil, completionHandler: ((URL?, Error?) -> Void)?) -> Self {
+
+        var downloadPath = downloadPath
+        if let output = self.data?["output"] as? [String: Any], let url = output["url"] as? String {
+
+            let formatter = ByteCountFormatter()
             formatter.allowsNonnumericFormatting = false
-            
-            self.currentRequest = CloudConvert.download(url, parameters: nil, destination:  { (temporaryURL, response) in
-                
-                var isDirectory: ObjCBool = false
-                
-                if (downloadPath != nil && isDirectory) {
-                    // downloadPath is a directory
-                    let downloadName = response.suggestedFilename!
-                    downloadPath = downloadPath!.URLByAppendingPathComponent(downloadName)
-                    do {
-                        try NSFileManager.defaultManager().removeItemAtURL(downloadPath!)
-                    } catch _ {
-                    }
-                    return downloadPath!
-                } else if(downloadPath != nil) {
-                    // downloadPath is a file
-                    let exists =  NSFileManager.defaultManager().fileExistsAtPath(downloadPath!.path!, isDirectory: &isDirectory)
-                    if(exists) {
-                        do {
-                            try NSFileManager.defaultManager().removeItemAtURL(downloadPath!)
-                        } catch _ {
-                        }
-                    }
-                    return downloadPath!
+
+            let destination: DownloadRequest.DownloadFileDestination = { (temporaryURL, response) in
+
+                if let downloadName = response.suggestedFilename {
+                    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                    downloadPath = documentsURL.appendingPathComponent(downloadName)
+
+                    return (downloadPath!, [.removePreviousFile, .createIntermediateDirectories])
                 } else {
-                    // downloadPath not set
-                    if let directoryURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first   {
-                        let downloadName = response.suggestedFilename!
-                        downloadPath = directoryURL.URLByAppendingPathComponent(downloadName)
-                        do {
-                            try NSFileManager.defaultManager().removeItemAtURL(downloadPath!)
-                        } catch _ {
-                        }
-                        return downloadPath!
-                    }
+                    return (temporaryURL, [.removePreviousFile, .createIntermediateDirectories])
                 }
-                
-                return temporaryURL
-            }) .progress { (bytesWritten, totalBytesWritten, totalBytesExpectedToWrite) in
-                
-                let percent: Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite) * 100
-                let message = "Downloading (" + formatter.stringFromByteCount(totalBytesWritten) + " / " + formatter.stringFromByteCount(totalBytesExpectedToWrite) + ") ..."
-                self.delegate?.conversionProgress(self, step: "download", percent: percent, message: message)
-                self.progressHandler?(step: "download", percent: percent, message: message)
-                
-            }.response { (request, response, data, error) in
-                
-                self.progressHandler?(step: "finished", percent: 100, message: "Conversion finished!")
-                self.delegate?.conversionProgress(self, step: "finished", percent: 100, message: "Conversion finished!")
-                
-                completionHandler?(downloadPath, error)
-                self.delegate?.conversionFileDownloaded(self, path: downloadPath!)
             }
 
-        
+            currentRequest = ccDownload(url: url, destination: destination).downloadProgress(closure: { [weak self] progress in
+
+                let totalBytesExpectedToSend = progress.totalUnitCount
+                let totalBytesSent = progress.completedUnitCount
+
+                let percent = CGFloat(totalBytesSent) / CGFloat(totalBytesExpectedToSend)
+                let message = "Uploading (" + formatter.string(fromByteCount: totalBytesSent) + " / " + formatter.string(fromByteCount: totalBytesExpectedToSend) + ") ..."
+
+                if let strongSelf = self {
+                    strongSelf.delegate?.conversionProgress(process: strongSelf, step: "download", percent: percent, message: message)
+                    strongSelf.progressHandler?("download", percent, message)
+                }
+            }).response(completionHandler: { [weak self] response in
+
+                if let strongSelf = self {
+                    strongSelf.delegate?.conversionProgress(process: strongSelf, step: "finished", percent: 100, message: "Conversion finished!")
+                }
+                self?.progressHandler?("finished", 100, "Conversion finished!")
+                completionHandler?(downloadPath, response.error)
+
+                if let downloadPath = downloadPath {
+                    self?.delegate?.conversionFileDownloaded(process: self, path: downloadPath)
+                }
+            })
         } else {
             completionHandler?(nil, NSError(domain: errorDomain, code: -1, userInfo: ["localizedDescription" : "Output file not yet available!"] ))
         }
         return self
     }
-    
+
     /**
-    
-    Waits until the conversion has finished
-    
-    :param: completionHandler   The code to be executed once the conversion has finished.
-    
-    :returns: CloudConvert.Process
-    
-    */
-    public func wait(completionHandler: ((NSError?) -> Void)?) -> Self {
+
+     Waits until the conversion has finished
+
+     :param: completionHandler   The code to be executed once the conversion has finished.
+
+     :returns: CloudConvert.Process
+
+     */
+    public func wait(completionHandler: ((Error?) -> Void)?) -> Self {
 
         self.waitCompletionHandler = completionHandler
-        dispatch_async(dispatch_get_main_queue(),{
-            self.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self as Process, selector: Selector("refreshTimerTick"), userInfo: nil, repeats: true)
-        })
-        
-        return self
-    }
-    
-    
-    public func refreshTimerTick() {
-        self.refresh()
-    }
-    
-    
-    /**
-    
-    Cancels the conversion, including any running upload or download.
-    Also deletes the process from the CloudConvert API.
-    
-    :returns: CloudConvert.Process
-    
-    */
-    public func cancel() -> Self {
-        
-        self.currentRequest?.cancel()
-        self.currentRequest = nil;
-        
-        dispatch_async(dispatch_get_main_queue(),{
-            self.refreshTimer?.invalidate()
-            self.refreshTimer = nil
-        })
-        
-        if(self.url != nil) {
-            CloudConvert.req(.DELETE, URLString: self.url!, parameters: nil)
+        DispatchQueue.main.async {
+            self.refreshTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(Process.refreshTimerTick), userInfo: nil, repeats: true)
         }
 
         return self
     }
-    
+
+    @objc public func refreshTimerTick() {
+        _ = self.refresh()
+    }
+
+    /**
+
+     Cancels the conversion, including any running upload or download.
+     Also deletes the process from the CloudConvert API.
+
+     :returns: CloudConvert.Process
+
+     */
+    @discardableResult
+    public func cancel() -> Self {
+
+        self.currentRequest?.cancel()
+        self.currentRequest = nil;
+
+        DispatchQueue.main.async {
+            self.refreshTimer?.invalidate()
+            self.refreshTimer = nil
+        }
+
+        if let url = self.url {
+            _ = req(url: url, method: .delete, parameters: nil)
+        }
+
+        return self
+    }
+
     // Printable
     public override var description: String {
-        return "Process " + (self.url != nil ? self.url! : "") + " " + ( data != nil ? data!.description : "")
+        return "Process " + (self.url ?? "") + " " + ( data?.description ?? "")
     }
-    
-    
 }
 
 
@@ -633,82 +513,83 @@ public class Process: NSObject {
 
 /**
 
-Converts a file using the CloudConvert API.
+ Converts a file using the CloudConvert API.
 
-:param: parameters          Parameters for the conversion.
-                            Can be generated using the API Console: https://cloudconvert.com/apiconsole
+ :param: parameters          Parameters for the conversion.
+ Can be generated using the API Console: https://cloudconvert.com/apiconsole
 
-:param: progressHandler     Can be used to monitor the progress of the conversion.
-                            Parameters of the Handler:
-                            step:        Current step of the process; see https://cloudconvert.com/apidoc#status ;
-                            percent:     Percentage (0-100) of the current step as Float value;
-                            message:     Description of the current progress
+ :param: progressHandler     Can be used to monitor the progress of the conversion.
+ Parameters of the Handler:
+ step:        Current step of the process; see https://cloudconvert.com/apidoc#status ;
+ percent:     Percentage (0-100) of the current step as Float value;
+ message:     Description of the current progress
 
-:param: completionHandler   The code to be executed once the conversion has finished.
-                            Parameters of the Handler:
-                            path:       local NSURL of the downloaded output file;
-                            error:      NSError if the conversion failed
-                            
-:returns: A CloudConvert.Porcess object, which can be used to cancel the conversion.
+ :param: completionHandler   The code to be executed once the conversion has finished.
+ Parameters of the Handler:
+ path:       local NSURL of the downloaded output file;
+ error:      Error if the conversion failed
 
-*/
-public func convert(parameters: [String: AnyObject], progressHandler: ((step: String?, percent: Float?, message: String?) -> Void)? = nil ,  completionHandler: ((NSURL?, NSError?) -> Void)? = nil) -> Process {
-    
-    let process = Process()
+ :returns: A CloudConvert.Porcess object, which can be used to cancel the conversion.
+
+ */
+public func convert(parameters: [String: Any], progressHandler: ((_ step: String?, _ percent: CGFloat?, _ message: String?) -> Void)? = nil, completionHandler: ((URL?, Error?) -> Void)? = nil) -> Process {
+
+    var process = Process()
     process.progressHandler = progressHandler
-    
-    process.create(parameters, completionHandler: { (error) -> Void in
-        if(error != nil) {
+
+    process = process.create(parameters: parameters) { error in
+
+        if let error = error {
             completionHandler?(nil, error)
         } else {
-            process.start(parameters, completionHandler: { (error) -> Void in
-                if(error != nil) {
+
+            process = process.start(parameters: parameters) { error in
+
+                if let error = error {
                     completionHandler?(nil, error)
                 } else {
-                    process.wait({ (error) -> Void in
-                        if(error != nil) {
+
+                    process = process.wait { error in
+
+                        if let error = error {
                             completionHandler?(nil, error)
                         } else {
-                            if let download = parameters["download"] as? NSURL  {
-                                process.download(download, completionHandler: completionHandler)
-                            } else if let download = parameters["download"] as? String where download != "false" {
-                                process.download(completionHandler: completionHandler)
-                            } else if let download = parameters["download"] as? Bool where download != false {
-                                process.download(completionHandler: completionHandler)
+
+                            if let download = parameters["download"] as? URL {
+                                process = process.download(downloadPath: download, completionHandler: completionHandler)
+                            } else if let download = parameters["download"] as? String, download != "false" {
+                                process = process.download(completionHandler: completionHandler)
+                            } else if let download = parameters["download"] as? Bool, download != false {
+                                process = process.download(completionHandler: completionHandler)
                             } else {
                                 completionHandler?(nil, nil)
                             }
                         }
-                    })
+                    }
                 }
-            })
-            
+            }
         }
-    })
-    
-    
+    }
+
     return process
 }
 
 /**
 
-Find possible conversion types. 
+ Find possible conversion types.
 
-:param: parameters          Find conversion types for a specific inputformat and/or outputformat.
-                            For example: ["inputformat" : "png"]
-                            See https://cloudconvert.com/apidoc#types
-:param: completionHandler   The code to be executed once the request has finished.
+ :param: parameters          Find conversion types for a specific inputformat and/or outputformat.
+ For example: ["inputformat" : "png"]
+ See https://cloudconvert.com/apidoc#types
+ :param: completionHandler   The code to be executed once the request has finished.
 
-*/
-public func conversionTypes( parameters: [String: AnyObject], completionHandler: (Array<[String: AnyObject]>?, NSError?) -> Void) -> Void {
-    req(.GET, URLString: "/conversiontypes", parameters: parameters).responseCloudConvertApi { (_, _, data, error) -> Void in
-        if let types = data as? Array<[String: AnyObject]> {
+ */
+public func conversionTypes(parameters: [String: Any], completionHandler: @escaping (Array<[String: Any]>?, Error?) -> Void) -> Void {
+    req(url: "/conversiontypes", method: .get, parameters: parameters).responseJSON { (response) in
+        if let types = response.value as? Array<[String: Any]> {
             completionHandler(types, nil)
         } else {
-            completionHandler(nil, error)
+            completionHandler(nil, response.error)
         }
     }
 }
-
-
-
