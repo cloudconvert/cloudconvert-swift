@@ -14,7 +14,6 @@
 		48F6DBEE1ACEF54300C63959 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48F6DBED1ACEF54300C63959 /* Images.xcassets */; };
 		48F6DBF11ACEF54300C63959 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 48F6DBEF1ACEF54300C63959 /* LaunchScreen.xib */; };
 		50DB73B6E1DB6372397274C9 /* Pods_CloudConvertExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC17190110A25E3707525070 /* Pods_CloudConvertExample.framework */; };
-		E5A98ACE1FBBA39E006533DF /* bok.fb2 in Resources */ = {isa = PBXBuildFile; fileRef = E5A98ACD1FBBA39E006533DF /* bok.fb2 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +28,6 @@
 		48F6DBF01ACEF54300C63959 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		878224C186E3A761EF299877 /* Pods-CloudConvertExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudConvertExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-CloudConvertExample/Pods-CloudConvertExample.release.xcconfig"; sourceTree = "<group>"; };
 		8B7DAA5C8678A28CEA999FAD /* Pods-CloudConvertExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudConvertExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CloudConvertExample/Pods-CloudConvertExample.debug.xcconfig"; sourceTree = "<group>"; };
-		E5A98ACD1FBBA39E006533DF /* bok.fb2 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = bok.fb2; sourceTree = "<group>"; };
 		FC17190110A25E3707525070 /* Pods_CloudConvertExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudConvertExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -57,7 +55,6 @@
 		48EAF9871AD061200096B526 /* Testfiles */ = {
 			isa = PBXGroup;
 			children = (
-				E5A98ACD1FBBA39E006533DF /* bok.fb2 */,
 				48EAF9881AD0613D0096B526 /* file.png */,
 			);
 			name = Testfiles;
@@ -177,7 +174,6 @@
 			files = (
 				48EAF9891AD0613D0096B526 /* file.png in Resources */,
 				48F6DBEC1ACEF54300C63959 /* Main.storyboard in Resources */,
-				E5A98ACE1FBBA39E006533DF /* bok.fb2 in Resources */,
 				48F6DBF11ACEF54300C63959 /* LaunchScreen.xib in Resources */,
 				48F6DBEE1ACEF54300C63959 /* Images.xcassets in Resources */,
 			);
